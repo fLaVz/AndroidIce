@@ -1,11 +1,9 @@
-package com.androidapp;
-
 import android.annotation.TargetApi;
 import android.os.Build;
 
 import com.zeroc.Ice.Communicator;
 import com.zeroc.Ice.Util;
-import com.androidapp.mp3App.*;
+import mp3App.*;
 
 public class Client {
 

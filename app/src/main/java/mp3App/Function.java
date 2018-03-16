@@ -18,7 +18,7 @@
 // </auto-generated>
 //
 
-package com.androidapp.mp3App;
+package mp3App;
 
 public interface Function extends com.zeroc.Ice.Object
 {

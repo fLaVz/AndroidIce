@@ -18,7 +18,7 @@
 // </auto-generated>
 //
 
-package com.androidapp.mp3App;
+package mp3App;
 
 public class _FunctionPrxI extends com.zeroc.Ice._ObjectPrxI implements FunctionPrx
 {
