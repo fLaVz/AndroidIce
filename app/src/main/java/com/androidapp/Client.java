@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.Util;
+
 import mp3App.*;
 
 public class Client extends AppCompatActivity {
@@ -19,7 +21,7 @@ public class Client extends AppCompatActivity {
 		System.out.println("Click");
 
 		try {
-			Communicator ic = com.zeroc.Ice.Util.initialize();
+			Communicator ic = Util.initialize();
 			FunctionPrx function = FunctionPrx.checkedCast(ic.stringToProxy("server:tcp -h 10.0.2.2 -p 10000"));
 			if (function == null) {
 				throw new Error("Invalid proxy");
