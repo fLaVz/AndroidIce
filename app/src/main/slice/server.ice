@@ -31,5 +31,6 @@ module mp3App
         void printPlayList();
         playList receivePlaylist();
         void playMusic();
+        void stopMusic();
     };
 };

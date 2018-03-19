@@ -281,6 +281,33 @@ public interface FunctionPrx extends com.zeroc.Ice.ObjectPrx
         return f;
     }
 
+    default void stopMusic()
+    {
+        stopMusic(com.zeroc.Ice.ObjectPrx.noExplicitContext);
+    }
+
+    default void stopMusic(java.util.Map<String, String> context)
+    {
+        _iceI_stopMusicAsync(context, true).waitForResponse();
+    }
+
+    default java.util.concurrent.CompletableFuture<Void> stopMusicAsync()
+    {
+        return _iceI_stopMusicAsync(com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
+    }
+
+    default java.util.concurrent.CompletableFuture<Void> stopMusicAsync(java.util.Map<String, String> context)
+    {
+        return _iceI_stopMusicAsync(context, false);
+    }
+
+    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_stopMusicAsync(java.util.Map<String, String> context, boolean sync)
+    {
+        com.zeroc.IceInternal.OutgoingAsync<Void> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "stopMusic", null, sync, null);
+        f.invoke(false, context, null, null, null);
+        return f;
+    }
+
     /**
      * Contacts the remote server to verify that the object implements this type.
      * Raises a local exception if a communication error occurs.

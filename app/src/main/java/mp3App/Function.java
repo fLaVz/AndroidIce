@@ -40,6 +40,8 @@ public interface Function extends com.zeroc.Ice.Object
 
     void playMusic(com.zeroc.Ice.Current current);
 
+    void stopMusic(com.zeroc.Ice.Current current);
+
     static final String[] _iceIds =
     {
         "::Ice::Object",
@@ -156,6 +158,14 @@ public interface Function extends com.zeroc.Ice.Object
         return inS.setResult(inS.writeEmptyParams());
     }
 
+    static java.util.concurrent.CompletionStage<com.zeroc.Ice.OutputStream> _iceD_stopMusic(Function obj, final com.zeroc.IceInternal.Incoming inS, com.zeroc.Ice.Current current)
+    {
+        com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
+        inS.readEmptyParams();
+        obj.stopMusic(current);
+        return inS.setResult(inS.writeEmptyParams());
+    }
+
     final static String[] _iceOps =
     {
         "add",
@@ -170,7 +180,8 @@ public interface Function extends com.zeroc.Ice.Object
         "searchByArtist",
         "searchByGenre",
         "searchByName",
-        "sendPlayList"
+        "sendPlayList",
+        "stopMusic"
     };
 
     @Override
@@ -236,6 +247,10 @@ public interface Function extends com.zeroc.Ice.Object
             case 12:
             {
                 return _iceD_sendPlayList(this, in, current);
+            }
+            case 13:
+            {
+                return _iceD_stopMusic(this, in, current);
             }
         }
 
