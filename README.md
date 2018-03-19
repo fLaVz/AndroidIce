@@ -1,4 +1,9 @@
 # AndroidIce
+This is a small android application that reads a streaming mp3 song from a python server. 
+
+Ice is used to communicate with the server.
+
+The music is played on the android device. You can play/pause and stop the music.
 
 ## Client
 Simply hit the play button! :+1:
