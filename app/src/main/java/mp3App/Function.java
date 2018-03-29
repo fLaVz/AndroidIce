@@ -22,7 +22,7 @@ package mp3App;
 
 public interface Function extends com.zeroc.Ice.Object
 {
-    void sendPlayList(Song[] seq, com.zeroc.Ice.Current current);
+    void sendPlayList(String[] seq, com.zeroc.Ice.Current current);
 
     void add(Song son, com.zeroc.Ice.Current current);
 
@@ -36,9 +36,9 @@ public interface Function extends com.zeroc.Ice.Object
 
     void printPlayList(com.zeroc.Ice.Current current);
 
-    Song[] receivePlaylist(com.zeroc.Ice.Current current);
+    String[] receivePlaylist(com.zeroc.Ice.Current current);
 
-    void playMusic(com.zeroc.Ice.Current current);
+    void playMusic(String music, com.zeroc.Ice.Current current);
 
     void stopMusic(com.zeroc.Ice.Current current);
 
@@ -69,8 +69,8 @@ public interface Function extends com.zeroc.Ice.Object
     {
         com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
         com.zeroc.Ice.InputStream istr = inS.startReadParams();
-        Song[] iceP_seq;
-        iceP_seq = playListHelper.read(istr);
+        String[] iceP_seq;
+        iceP_seq = istr.readStringSeq();
         inS.endReadParams();
         obj.sendPlayList(iceP_seq, current);
         return inS.setResult(inS.writeEmptyParams());
@@ -143,9 +143,9 @@ public interface Function extends com.zeroc.Ice.Object
     {
         com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
         inS.readEmptyParams();
-        Song[] ret = obj.receivePlaylist(current);
+        String[] ret = obj.receivePlaylist(current);
         com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
-        playListHelper.write(ostr, ret);
+        ostr.writeStringSeq(ret);
         inS.endWriteParams(ostr);
         return inS.setResult(ostr);
     }
@@ -153,8 +153,11 @@ public interface Function extends com.zeroc.Ice.Object
     static java.util.concurrent.CompletionStage<com.zeroc.Ice.OutputStream> _iceD_playMusic(Function obj, final com.zeroc.IceInternal.Incoming inS, com.zeroc.Ice.Current current)
     {
         com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
-        inS.readEmptyParams();
-        obj.playMusic(current);
+        com.zeroc.Ice.InputStream istr = inS.startReadParams();
+        String iceP_music;
+        iceP_music = istr.readString();
+        inS.endReadParams();
+        obj.playMusic(iceP_music, current);
         return inS.setResult(inS.writeEmptyParams());
     }
 

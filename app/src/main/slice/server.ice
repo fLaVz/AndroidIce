@@ -18,7 +18,7 @@ module mp3App
         string path;
     };
 
-    sequence<Song> playList;
+    sequence<string> playList;
 
     interface Function
     {
@@ -30,7 +30,7 @@ module mp3App
         void searchByArtist(string name);
         void printPlayList();
         playList receivePlaylist();
-        void playMusic();
+        void playMusic(string music);
         void stopMusic();
     };
 };

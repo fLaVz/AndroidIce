@@ -1,118 +1,161 @@
 package com.androidapp;
 
 import android.app.ProgressDialog;
-import android.media.MediaPlayer;
-import android.media.AudioManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.zeroc.Ice.Communicator;
 import com.zeroc.Ice.Util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import mp3App.*;
+
+import static com.google.android.exoplayer2.ExoPlayerLibraryInfo.TAG;
 
 public class Client extends AppCompatActivity {
 
-	MediaPlayer mediaPlayer;
-	ProgressDialog progressDialog;
 	FunctionPrx function;
 	Communicator ic;
-	Button playButton;
-	Button stopButton;
+
+	SimpleExoPlayer mediaPlayer;
+	PlayerView playerView;
+	ListView listView;
+	TextView highlitedMusic;
+
+	String selectedMusic;
+	boolean playWhenReady = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_player);
 
-		playButton = (Button) findViewById(R.id.playButton);
-		stopButton = (Button) findViewById(R.id.stopButton);
+		playerView = findViewById(R.id.video_view);
+		listView = (ListView) findViewById(R.id.listView);
+		highlitedMusic = (TextView) findViewById(R.id.tv);
+		selectedMusic = "";
 
-		playButton.setOnClickListener(new View.OnClickListener() {
+		ic = Util.initialize();
+		function = FunctionPrx.checkedCast(ic.stringToProxy("server:tcp -h 10.0.2.2 -p 10000"));
+
+		initializeMusicList();
+
+	}
+
+	private void initializePlayer() {
+
+		mediaPlayer = ExoPlayerFactory.newSimpleInstance(
+				new DefaultRenderersFactory(this),
+				new DefaultTrackSelector(), new DefaultLoadControl());
+
+		playerView.setPlayer(mediaPlayer);
+		mediaPlayer.setPlayWhenReady(false);
+		mediaPlayer.seekTo(0);
+
+		Uri uri = Uri.parse(getString(R.string.url));
+		MediaSource mediaSource = buildMediaSource(uri);
+		mediaPlayer.prepare(mediaSource, true, false);
+
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		initializePlayer();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (mediaPlayer == null) {
+			initializePlayer();
+		}
+
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		releasePlayer();
+	}
+
+	@Override
+	public void onStop() {
+		function.stopMusicAsync();
+		super.onStop();
+		releasePlayer();
+	}
+
+	private void releasePlayer() {
+		if (mediaPlayer != null) {
+			playWhenReady = mediaPlayer.getPlayWhenReady();
+			mediaPlayer.release();
+			mediaPlayer = null;
+			function.stopMusic();
+		}
+	}
+
+	private MediaSource buildMediaSource(Uri uri) {
+		return new ExtractorMediaSource.Factory(
+				new DefaultHttpDataSourceFactory("exoplayer-codelab")).
+				createMediaSource(uri);
+	}
+
+	public void initializeMusicList() {
+
+		List<String> musicList = new ArrayList<>();
+		musicList = Arrays.asList(function.receivePlaylist());
+		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
+				(this, android.R.layout.simple_list_item_1, musicList) {
 			@Override
-			public void onClick(View view) {
-				onClickPlayButton(view);
+			public View getView(int position, View convertView, ViewGroup parent){
+
+				View view = super.getView(position, convertView, parent);
+				TextView tv = (TextView) view.findViewById(android.R.id.text1);
+				tv.setTextColor(getResources().getColor(R.color.colorText));
+				return view;
+			}
+
+		};
+		listView.setAdapter(arrayAdapter);
+
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				selectedMusic = (String) parent.getItemAtPosition(position);
+				highlitedMusic.setText("Song selected : " + selectedMusic + ", hit the play button!");
+				function.stopMusicAsync();
+				function.playMusicAsync(selectedMusic);
+				initializePlayer();
+				mediaPlayer.setPlayWhenReady(true);
 			}
 		});
 
-		stopButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				onClickStopButton(view);
-			}
-		});
-		//progressDialog = new ProgressDialog(this);
 
-	}
-
-	public void onClickPlayButton(View v) {
-		System.out.println("Click");
-
-		TextView tv = (TextView)findViewById(R.id.playButton);
-		String textBtn = tv.getText().toString();
-		System.out.println(textBtn);
-		String modify = "";
-
-		try {
-			// Init Ice communication with server
-			ic = Util.initialize();
-			function = FunctionPrx.checkedCast(ic.stringToProxy("server:tcp -h 10.0.2.2 -p 10000"));
-			if (function == null) {
-				throw new Error("Invalid proxy");
-			}
-
-			// Handle PLAY/PAUSE action by changing textButton
-			if(textBtn.equals("PLAY")){
-				startPlayer();
-				modify = "PAUSE";
-				tv.setText(modify);
-			}else if(textBtn.equals("PAUSE")) {
-				mediaPlayer.pause();
-				modify = "PLAY";
-				tv.setText(modify);
-			}
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void startPlayer() {
-		try {
-			// Do not create a mediaPlayer if it already exists
-			if(mediaPlayer == null) {
-				function.playMusicAsync();
-				mediaPlayer = new MediaPlayer();
-				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-				mediaPlayer.setDataSource("http://10.0.2.2:8080");
-				mediaPlayer.prepare();
-				mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-					@Override
-					public void onCompletion(MediaPlayer mp) {
-						mediaPlayer.release();
-					}
-				});
-			}
-			// Out of the loop for PAUSE case
-			mediaPlayer.start();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void onClickStopButton(View v) {
-		try {
-			System.out.println("ClickStop");
-			// Do not call function methods if not initialized
-			if(function != null) {
-				function.stopMusic();
-				mediaPlayer.reset();
-				mediaPlayer.release();
-			}
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

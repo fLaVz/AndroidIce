@@ -22,31 +22,31 @@ package mp3App;
 
 public interface FunctionPrx extends com.zeroc.Ice.ObjectPrx
 {
-    default void sendPlayList(Song[] seq)
+    default void sendPlayList(String[] seq)
     {
         sendPlayList(seq, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default void sendPlayList(Song[] seq, java.util.Map<String, String> context)
+    default void sendPlayList(String[] seq, java.util.Map<String, String> context)
     {
         _iceI_sendPlayListAsync(seq, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<Void> sendPlayListAsync(Song[] seq)
+    default java.util.concurrent.CompletableFuture<Void> sendPlayListAsync(String[] seq)
     {
         return _iceI_sendPlayListAsync(seq, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<Void> sendPlayListAsync(Song[] seq, java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<Void> sendPlayListAsync(String[] seq, java.util.Map<String, String> context)
     {
         return _iceI_sendPlayListAsync(seq, context, false);
     }
 
-    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_sendPlayListAsync(Song[] iceP_seq, java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_sendPlayListAsync(String[] iceP_seq, java.util.Map<String, String> context, boolean sync)
     {
         com.zeroc.IceInternal.OutgoingAsync<Void> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "sendPlayList", null, sync, null);
         f.invoke(false, context, null, ostr -> {
-                     playListHelper.write(ostr, iceP_seq);
+                     ostr.writeStringSeq(iceP_seq);
                  }, null);
         return f;
     }
@@ -223,61 +223,63 @@ public interface FunctionPrx extends com.zeroc.Ice.ObjectPrx
         return f;
     }
 
-    default Song[] receivePlaylist()
+    default String[] receivePlaylist()
     {
         return receivePlaylist(com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default Song[] receivePlaylist(java.util.Map<String, String> context)
+    default String[] receivePlaylist(java.util.Map<String, String> context)
     {
         return _iceI_receivePlaylistAsync(context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<Song[]> receivePlaylistAsync()
+    default java.util.concurrent.CompletableFuture<String[]> receivePlaylistAsync()
     {
         return _iceI_receivePlaylistAsync(com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<Song[]> receivePlaylistAsync(java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<String[]> receivePlaylistAsync(java.util.Map<String, String> context)
     {
         return _iceI_receivePlaylistAsync(context, false);
     }
 
-    default com.zeroc.IceInternal.OutgoingAsync<Song[]> _iceI_receivePlaylistAsync(java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<String[]> _iceI_receivePlaylistAsync(java.util.Map<String, String> context, boolean sync)
     {
-        com.zeroc.IceInternal.OutgoingAsync<Song[]> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "receivePlaylist", null, sync, null);
+        com.zeroc.IceInternal.OutgoingAsync<String[]> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "receivePlaylist", null, sync, null);
         f.invoke(true, context, null, null, istr -> {
-                     Song[] ret;
-                     ret = playListHelper.read(istr);
+                     String[] ret;
+                     ret = istr.readStringSeq();
                      return ret;
                  });
         return f;
     }
 
-    default void playMusic()
+    default void playMusic(String music)
     {
-        playMusic(com.zeroc.Ice.ObjectPrx.noExplicitContext);
+        playMusic(music, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default void playMusic(java.util.Map<String, String> context)
+    default void playMusic(String music, java.util.Map<String, String> context)
     {
-        _iceI_playMusicAsync(context, true).waitForResponse();
+        _iceI_playMusicAsync(music, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<Void> playMusicAsync()
+    default java.util.concurrent.CompletableFuture<Void> playMusicAsync(String music)
     {
-        return _iceI_playMusicAsync(com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
+        return _iceI_playMusicAsync(music, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<Void> playMusicAsync(java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<Void> playMusicAsync(String music, java.util.Map<String, String> context)
     {
-        return _iceI_playMusicAsync(context, false);
+        return _iceI_playMusicAsync(music, context, false);
     }
 
-    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_playMusicAsync(java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_playMusicAsync(String iceP_music, java.util.Map<String, String> context, boolean sync)
     {
         com.zeroc.IceInternal.OutgoingAsync<Void> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "playMusic", null, sync, null);
-        f.invoke(false, context, null, null, null);
+        f.invoke(false, context, null, ostr -> {
+                     ostr.writeString(iceP_music);
+                 }, null);
         return f;
     }
 
