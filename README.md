@@ -11,7 +11,5 @@ Simply hit the play button! :+1:
 > http://10.0.2.2:8080/player.mp3
 
 ## Server
-Launch server using : 
-> python ServerI.py
 - Streaming link : 
 > http://localhost:8080/player.mp3
