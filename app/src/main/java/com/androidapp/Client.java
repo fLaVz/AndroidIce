@@ -1,13 +1,9 @@
 package com.androidapp;
 
-import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -17,9 +13,7 @@ import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -34,12 +28,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import mp3App.*;
-
-import static com.google.android.exoplayer2.ExoPlayerLibraryInfo.TAG;
+import metaServer.*;
 
 public class Client extends AppCompatActivity {
 
-	FunctionPrx function;
+	//FunctionPrx function;
+	msFunctionPrx function;
 	Communicator ic;
 
 	SimpleExoPlayer mediaPlayer;
@@ -61,7 +55,7 @@ public class Client extends AppCompatActivity {
 		selectedMusic = "";
 
 		ic = Util.initialize();
-		function = FunctionPrx.checkedCast(ic.stringToProxy("server:tcp -h 10.0.2.2 -p 10000"));
+		function = msFunctionPrx.checkedCast(ic.stringToProxy("server:tcp -h 10.0.2.2 -p 4061"));
 
 		initializeMusicList();
 
@@ -106,7 +100,8 @@ public class Client extends AppCompatActivity {
 
 	@Override
 	public void onStop() {
-		function.stopMusicAsync();
+		//function.stopMusicAsync();
+		function.parse("", "stop");
 		super.onStop();
 		releasePlayer();
 	}
@@ -116,7 +111,8 @@ public class Client extends AppCompatActivity {
 			playWhenReady = mediaPlayer.getPlayWhenReady();
 			mediaPlayer.release();
 			mediaPlayer = null;
-			function.stopMusic();
+			//function.stopMusic();
+			function.parse("", "stop");
 		}
 	}
 
@@ -126,10 +122,11 @@ public class Client extends AppCompatActivity {
 				createMediaSource(uri);
 	}
 
+	// Create the music list based on running servers
 	public void initializeMusicList() {
 
 		List<String> musicList = new ArrayList<>();
-		musicList = Arrays.asList(function.receivePlaylist());
+		musicList = Arrays.asList(function.receive());
 		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
 				(this, android.R.layout.simple_list_item_1, musicList) {
 			@Override
@@ -144,18 +141,19 @@ public class Client extends AppCompatActivity {
 		};
 		listView.setAdapter(arrayAdapter);
 
+		// Handle events while clicking on a song in the item list
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				selectedMusic = (String) parent.getItemAtPosition(position);
 				highlitedMusic.setText("Song selected : " + selectedMusic + ", hit the play button!");
-				function.stopMusicAsync();
-				function.playMusicAsync(selectedMusic);
+				//function.stopMusicAsync();
+				//function.playMusicAsync(selectedMusic);
+				function.parse(selectedMusic, "stop");
+				function.parse(selectedMusic, "play");
 				initializePlayer();
 				mediaPlayer.setPlayWhenReady(true);
 			}
 		});
-
-
 	}
 }

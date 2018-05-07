@@ -6,31 +6,13 @@
 
 #pragma once
 
-module mp3App
+module metaServer
 {
-
-    struct Song
-    {
-        string name;
-        string artist;
-        string genre;
-        string length;
-        string path;
-    };
-
     sequence<string> playList;
 
-    interface Function
+    interface msFunction
     {
-        void sendPlayList(playList seq);
-        void add(Song son);
-        void remove(string name);
-        void searchByName(string name);
-        void searchByGenre(string genre);
-        void searchByArtist(string name);
-        void printPlayList();
-        playList receivePlaylist();
-        void playMusic(string music);
-        void stopMusic();
+        void parse(string data, string action);
+        playList receive();
     };
 };
